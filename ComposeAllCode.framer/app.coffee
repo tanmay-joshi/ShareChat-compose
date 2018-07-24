@@ -12,6 +12,7 @@ height = 32
 galleryData = JSON.parse Utils.domLoadDataSync "data/galleryData.json"
 tagsData = JSON.parse Utils.domLoadDataSync "data/Bucketdata2.json"
 iconsData = JSON.parse Utils.domLoadDataSync "data/icons.json"
+horizontalTagsData = JSON.parse Utils.domLoadDataSync "data/horizontalTagsData.json"
 
 
 #Header Class
@@ -390,6 +391,7 @@ Text = new Layer
 	backgroundColor: "white"
 	size: Screen.size
 	x: Screen.width * 2
+	
 TextHeader = new Header
 	parent: Text
 TextHeader.ScreenName.text = "Text"
@@ -400,6 +402,16 @@ TextBody = new Layer
 	width: Screen.width
 	height: Screen.height - TextHeader.height
 	backgroundColor: "white"
+	
+horizontalTagSelect = new Layer
+	z: 3
+	x: Align.center, y: Screen.midY
+	width: Screen.width, height: Screen.height/2
+	borderRadius: 16
+	backgroundColor: "white"
+	shadowBlur: 10, shadowY: 1, shadowColor: "gray"
+	name: "horizontalTagSelect"
+	visible: false
 
 Camera = new Layer
 	z: 3
@@ -490,6 +502,8 @@ UploadContainer = new Layer
 	width: Screen.width
 	height: Screen.width
 	backgroundColor: "#ccc"
+
+
 
 
 #flow
@@ -844,12 +858,15 @@ GalleryHeader.Back.onClick ->
 profile = new profileHead
 	parent: Text
 	y: TextHeader.height
+	name: "profile"	
+	
 profile.ProfileTag.text = "Select Tag"
 profile.ProfileName.text = "Sohil"
 profile.ProfileBio.text = "Bhokal toh m hee hu.. baaki ka pata nhi"
-
+	
 profile.ProfileTag.onClick ->
-	flow.showNext(TagSelect)
+	profile.ProfileTag.text = "Selecting"
+	flow.showOverlayBottom(horizontalTagSelect)
 
 InputText = new Layer
 	parent: Text
@@ -997,7 +1014,17 @@ ALignImage = new Layer
 	scale: 0.5
 	image: "images/Icons/ActionIcons/04.png"
 
-
+blurOpacityLayer = new Layer
+	size: Text.size
+	parent: Text
+	blur: 6
+	visible: false
+# 
+# blurOpacityLayer.onClick ->
+# 	print("yay")
+# 	@.visible = false
+# 	flow.showPrevious()
+# 
 #Text All Functions 
 TextHeader.Back.onClick ->
 	flow.showPrevious()
@@ -1035,6 +1062,221 @@ AlignFunction.onClick ->
 TextHeader.ExtraFeature.onClick ->
 		flow.showNext(TagSelect)
 
+
+
+#Horizontal Tag Select
+
+rows = horizontalTagsData.buckets.length
+gutter = 20
+horizontalBucketSize = 56
+tagWidthRatio = 0.20
+padding = 20
+scalefactor = 1
+borderRadius = 8
+
+focusedFrame = new PageComponent
+	backgroundColor: "transparent"
+	borderWidth: 6, borderRadius: borderRadius, borderColor: "rgba(255,255,255,0)"
+	width: horizontalBucketSize*1.4, height: horizontalBucketSize*1.4
+	shadowBlur: 6, shadowY: 1, shadowColor: "gray"
+	x: Align.center, y: Align.bottom(-padding)
+	parent: horizontalTagSelect
+	z: 1
+	clip: false
+	scrollVertical: false
+
+centerFrame = focusedFrame.screenFrame
+centerPoint = Utils.frameCenterPoint(centerFrame)
+
+class horizontalBucket extends Layer
+	constructor: (@options={}) ->
+		@options.width = horizontalBucketSize
+		@options.height = horizontalBucketSize
+		@options.parent = focusedFrame.content
+		@options.borderRadius = borderRadius
+		@options.scale = 1
+		
+		
+		@thumbnail = new Layer
+			borderRadius:  borderRadius
+
+		super @options
+		
+		@thumbnail.parent = @
+		@thumbnail.width = horizontalBucketSize*0.7
+		@thumbnail.height = horizontalBucketSize*0.7	
+		@thumbnail.center()
+		@thumbnail.style = backgroundSize: "contain"
+		
+		@onClick ->
+			focusedFrame.snapToPage(@)
+			@.states.switchInstant "active"
+			
+		@states=
+			"active":
+				opacity: 1
+				scale: 1
+			"default":
+				opacity: 0.6
+				scale: 0.98
+			
+
+horizontalBuckets = []
+middleObjectIndex = Math.round(rows/2) - 1
+scaleForIndex = (index) ->
+	if index != middleObjectIndex
+		return Math.pow scalefactor, Math.abs(middleObjectIndex - index)
+	else
+		return 1
+
+for horizontalBucketObject, index in horizontalTagsData.buckets
+		cell = new horizontalBucket
+			name: "horizontalBucket #{index+1}"
+			x: index*(gutter+horizontalBucketSize) + padding
+			backgroundColor: horizontalBucketObject.backgroundColor, opacity: scaleForIndex(index)
+		cell.thumbnail.image = horizontalBucketObject.image
+	
+		cell.centerY()
+		cell.scale = scaleForIndex(index)
+		cell.data = horizontalBucketObject
+		horizontalBuckets[index] = cell
+
+
+horizontalTags = [0...10]
+tagLayers = []
+tagsContainer = new ScrollComponent
+	width: Screen.width*0.9, height: horizontalTagSelect.height
+	y: 0, x: Align.center
+	parent: horizontalTagSelect
+
+tagsContainer.scrollHorizontal = false
+tagsContainer.content.backgroundColor = "transparent"
+tagsContainer.backgroundColor = "transparent"
+tagsContainer.mouseWheelEnabled = true
+tagsContainer.visible = true
+tagsContainer.content.clip = false
+tagsContainer.contentInset = 
+		top: padding
+		bottom: padding	
+
+tittle = new TextLayer
+	y: Align.top
+	textAlign: Align.center
+	fontWeight: "bold"
+	fontSize: 20
+	color: "black"
+	parent: tagsContainer.content
+
+blurLayer = new Layer
+	parent: horizontalTagSelect
+	y: Align.bottom(-padding)
+	height: horizontalBucketSize*1.4
+	width: Screen.width
+	backgroundColor: "white"
+	blur: 30
+	opacity: 0.9
+		
+class Tag extends Layer
+	constructor: (@options={}) ->
+		@options.height = @options.width*tagWidthRatio
+		@options.backgroundColor = "transparent"
+		@options.borderRadius = borderRadius
+		@options.shadowBlur = 6
+		@options.shadowY = 1
+		@options.shadowColor = "gray"
+		autoSize: true
+		clip: true
+		
+		@label = new TextLayer
+			width: 0.9*@options.width
+			x: Align.left(8), y: Align.center
+			fontSize: 16
+			name: ".label"
+			color: "black"
+			clip: true
+# 		
+# 		@trendLabel = new TextLayer
+# 			fontSize: 12
+# 			name: ".trendLabel"
+# 			color: "black"
+# 			clip: true
+# 			
+# 		@trendIcon = new Layer
+# 			width: 1.83*0.3*@options.height, height: 0.3*@options.height
+# 			y: Align.center
+# 
+			
+		super @options
+		
+		@onClick ->
+			flow.showPrevious()
+			profile.ProfileTag.text = @label.text
+			profile.ProfileTag.backgroundColor = "#eed"
+			profile.ppTag.opacity = 0
+			profile.ProfileTag.borderWidth = 0
+		
+		@label.parent = @
+		@label.centerY()
+		@label.backgroundColor = "transparent"
+		
+# 		@trendLabel.parent = @
+# 		@trendLabel.centerY()
+# 		@trendLabel.x = @trendIcon.x +  @trendIcon.width + 4
+# 		@trendLabel.backgroundColor = "transparent"
+# 		
+# 		@trendIcon.parent = @
+# 		@trendIcon.centerY()
+# 		@trendIcon.x = @label.x + @label.width + 4
+# 		@trendIcon.image = "images/trend.png"
+		
+yPosition = tittle.height + tittle.y
+
+for tagObject, tagIndex in horizontalTags
+	tagWidth = (tagsContainer.width-1.2*padding)/2
+	tagHeight = 48
+	tagLayer = new Tag
+		width: tagWidth
+	xPosition = if (tagIndex%2 != 0 and tagIndex !=0) then tagWidth + padding 				else 0.2*padding
+	yPosition = tittle.height + tittle.y + padding + (Math.floor(tagIndex/2)) *(tagHeight)
+	tagLayer.parent = tagsContainer.content
+	tagLayer.x = xPosition
+	tagLayer.y = yPosition
+	tagLayer.label.text = ""
+# 	tagLayer.trendLabel.text = ""	
+	tagLayer.visible = false
+	tagLayers.push(tagLayer)	
+
+focusedFrame.on "change:currentPage", ->
+	
+		current = focusedFrame.verticalPageIndex(focusedFrame.currentPage)
+		focusedhorizontalBucket = horizontalBuckets[current]
+		tagsContainer.scrollToTop()
+		focusedhorizontalBucketIndex = horizontalBuckets.indexOf(focusedhorizontalBucket)
+		tittle.text = focusedhorizontalBucket.data.name
+		tittle.centerX()
+		
+		for tagLay in tagLayers
+			tagLay.visible = false 
+		
+		for tagObject, tagIndex in focusedhorizontalBucket.data.tags when tagIndex < horizontalTags.length
+			tagLayer = tagLayers[tagIndex]
+			
+			tagLayer.label.text = tagObject.name.slice(0, 16);
+# 			tagLayer.trendLabel.x = tagLayer.trendIcon.x + tagLayer.trendIcon.width + 4
+# 			tagLayer.trendIcon.x = tagLayer.label.x + tagLayer.label.width + 4
+# 			roundOff = Math.round(tagObject.noOfShares/10)
+# 			if roundOff > 100 
+# 				roundOff = Math.round(roundOff/100)
+# 			tagLayer.trendLabel.text = roundOff + "k"
+			tagLayer.visible = true	
+
+		for horizontalBucket, index in horizontalBuckets 
+			if index != current
+				horizontalBucket.states.switchInstant "default"
+			else 
+				horizontalBucket.states.switchInstant "active"
+
+focusedFrame.snapToPage(focusedFrame.content.children[4])
 
 #camera Functions
 cameraLayerViewV = new Layer
@@ -1552,5 +1794,6 @@ animationB = new Animation guidingArrow,
 navButtons[2].onClick ->
 	animationB.start()
 	animationB.on Events.AnimationEnd, animationA.start
+
 
 
