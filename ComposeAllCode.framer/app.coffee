@@ -489,7 +489,8 @@ UploadContainer = new Layer
 	x: Align.center
 	width: Screen.width
 	height: Screen.width
-	backgroundColor: "#ccc"
+	image: null
+	#backgroundColor: "#345"
 
 
 #flow
@@ -1347,6 +1348,8 @@ uploadProfile.ProfileTag.backgroundColor = "#eed"
 uploadProfile.ppTag.opacity = 0
 uploadProfile.ProfileTag.borderWidth = 0
 
+UploadContainer.image = iu
+
 uploadingBG = new Layer
 	parent: UploadBody
 	width: Screen.width - 2*padding
@@ -1355,6 +1358,7 @@ uploadingBG = new Layer
 	y: Align.center()
 	borderRadius: padding
 	backgroundColor: "#ddd"
+	#image: iu
 
 uploading = new Layer
 	originX: 0
@@ -1506,6 +1510,9 @@ uploading.onAnimationEnd ->
 
 UploadHeader.Back.onClick ->
 	flow.showPrevious()
+
+
+
 
 
 #guiding animation
