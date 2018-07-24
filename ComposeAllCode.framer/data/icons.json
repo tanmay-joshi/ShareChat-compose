@@ -1,0 +1,41 @@
+{"navIcons":[
+    {
+        "id": "1",
+        "link": "images/Icons/bottomIcons/1.png"
+    },
+    {
+        "id": "2",
+        "link": "images/Icons/bottomIcons/2.png"
+    },
+    {
+        "id": "3",
+        "link": "images/Icons/bottomIcons/3.png"
+    },
+    {
+        "id": "4",
+        "link": "images/Icons/bottomIcons/4.png"
+    },
+    {
+        "id": "5",
+        "link": "images/Icons/bottomIcons/5.png"
+    }
+],
+"ugc":[
+    {
+        "id": "1",
+        "link": "images/Icons/UGCIcons/1.png"
+    },
+    {
+        "id": "2",
+        "link": "images/Icons/UGCIcons/2.png"
+    },
+    {
+        "id": "3",
+        "link": "images/Icons/UGCIcons/3.png"
+    },
+    {
+        "id": "4",
+        "link": "images/Icons/UGCIcons/4.png"
+    }
+]
+}
