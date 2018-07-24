@@ -412,6 +412,7 @@ CameraHeader = new Header
 	backgroundColor: "null"
 	shadowY: 0
 	shadowColor: "null"
+	z: 5
 CameraHeader.ScreenName.text = "Camera"
 
 
@@ -1058,20 +1059,14 @@ shutter = new Layer
 
 CameraHeader.Back.onClick ->
 	flow.showPrevious()
-
+###
 FinalImageView = new Layer
 	parent: ImageEdit
 	width: Screen.width
 	height: Screen.height/1.5
 	y: Align.bottom()
 	visible: false
-
-
-
-shutter.onClick ->
-	cameraLayerObject.capture()
-	cameraLayerObject.stop()
-	flow.showNext(ImageEdit)
+###
 
 CameraLayer = require "CameraLayer"
 # Create a CameraLayer
@@ -1091,16 +1086,17 @@ shutter.onClick ->
 	flow.showNext(ImageEdit)
 
 	cameraLayerObject.onCapture (imageURL) ->
+		print imageURL
 		finalImageLayer = new Layer
-			x: FinalImageView.x
-			y: FinalImageView.y
-			width: FinalImageView.width
-			height: FinalImageView.height
+			x: ImageContainer.x
+			y: ImageContainer.y
+			width: ImageContainer.width
+			height: ImageContainer.height
 			image: imageURL
-			parent: FinalImageView.parent
+			parent: ImageContainer.parent
 		
-		#finalImageLayer.placeBehind(FinalImageView)
-		FinalImageView.visible = false
+		finalImageLayer.placeBehind(ImageContainer)
+		ImageContainer.visible = false
 
 
 #Draft Funtion
