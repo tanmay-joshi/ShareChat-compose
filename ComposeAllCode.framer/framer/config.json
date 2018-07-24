@@ -9,9 +9,9 @@
   "deviceType" : "samsung-galaxy-s8-midnight-black",
   "sharedPrototype" : true,
   "propertyPanelToggleStates" : {
-    "Filters" : false
+
   },
-  "projectId" : "2D428D84-3F64-4C05-BB1B-7BAD3F424624",
+  "projectId" : "F66AEE75-2608-482B-B566-1E0F2D249D01",
   "deviceOrientation" : 0,
   "selectedHand" : "",
   "showBezel" : false,
@@ -41,9 +41,9 @@
     "{23485, 1461}",
     "{24948, 775}",
     "{25788, 358}",
-    "{26148, 4238}",
-    "{30388, 3207}",
-    "{33597, 774}"
+    "{26148, 4264}",
+    "{30414, 3258}",
+    "{33674, 774}"
   ],
   "deviceScale" : "fit"
 }

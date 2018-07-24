@@ -862,7 +862,7 @@ Input = new InputModule.Input
 	parent: InputText
 	virtualKeyboard: true 
 	placeholder: "Kuch to likh hi do" 
-	placeholderColor: "#fff"
+	placeholderColor: "#ccc"
 	fontSize: 20
 	fontWeight: 300
 	y: Align.top(padding) # y position
@@ -1190,7 +1190,7 @@ scrollBucket.content.backgroundColor = "null"
 for i in [0...tagsData.buckets.length]
 	mazedar = new bucket
 		name: tagsData.buckets[i].bucketName
-		backgroundColor: "#00AAFF"
+		backgroundColor: tagsData.buckets[i].backgroundColor
 		#hueRotate: i * 10
 		x: Align.center(0)
 		y: 2*padding + (i * (bucketsBG.width - 5*padding))
@@ -1490,6 +1490,9 @@ Done.onClick ->
 
 uploading.onAnimationEnd ->
 	Cancel.destroy()
+
+UploadHeader.Back.onClick ->
+	flow.showPrevious()
 
 
 #guiding animation
