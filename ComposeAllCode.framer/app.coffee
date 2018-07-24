@@ -186,6 +186,409 @@ class bucket extends Layer
 		@bucketImage.x = Align.center()
 		@bucketImage.y = Align.center()
 
+#Explore Classes
+class ExploreBucketThumb extends Layer
+	constructor: (@options={}) ->
+		@options.width ?= thumbSize*.7
+		@options.height ?= thumbSize
+		@options.backgroundColor ?= "rgba(255,255,255,0)"
+		
+			
+		@label = new TextLayer
+			fontSize: 16
+
+			
+		@thumb = new Layer
+					
+		super @options
+		
+		@label.parent = @
+		@label.centerX()
+		@label.textAlign = "center"
+		@label.state = "default"
+		@label.width = @options.width
+		@label.autoHeight = yes
+		@label.y = thumbSize*0.75
+		@label.centerX()
+		@label.color = "rgba(255,255,255,1)"
+		@label.fontStyle = "bold"
+		@label.opacity = 0.7
+		
+		@thumb.parent = @
+		@thumb.width = thumbSize*0.7
+		@thumb.height = thumbSize*0.7
+		@thumb.centerX()
+		@thumb.state = "default"
+		@thumb.style = backgroundSize: "contain"
+		
+		@thumb.states = 
+			active:
+				opacity:1
+				scale: 1
+			default:
+				opacity: 0.5
+				scale: 0.8
+		
+		@label.states = 
+			active:
+				fontWeight: 600
+				opacity: 1
+			default:
+				fontWeight: 400
+				opacity: 0.4
+				
+		@onClick ->
+			if @.thumb.state == "default"
+				@.thumb.states.switchInstant "active"
+				@.thumb.state = "active"
+				@.label.states.switchInstant "active"
+				@.label.state = "active"
+				newActiveExploreBucket = (item for item in ExploreBucketBoxes when item.thumb == @)[0]
+				newActiveExploreBucket.states.switchInstant "active"
+				newActiveExploreBucket.state = "active"
+				newActiveExploreBucket.visible = true
+				activeExploreBucket = newActiveExploreBucket
+				newExploreBucketIndex = ExploreBucketBoxes.indexOf(newActiveExploreBucket)
+				centerExploreBucket = if newExploreBucketIndex > 1 then ExploreBucketBoxes[newExploreBucketIndex-1] 								else newActiveExploreBucket
+				ExploreBucketThumbnailsContainer.scrollToLayer(centerExploreBucket.thumb)
+				ExploreBucketThumbnailsContainer.states.active =
+					x: padding
+					parent: newActiveExploreBucket
+					visible: true
+					backgroundColor: newActiveExploreBucket.backgroundColor
+				ExploreBucketThumbnailsContainer.states.switchInstant "active"
+				ExploreBucketThumbnailsContainer.state = "active"
+				back.visible = true
+				back.parent = newActiveExploreBucket
+				activeIndex = ExploreBucketBoxes.indexOf(newActiveExploreBucket)
+				for inActiveExploreBucketBox, index in ExploreBucketBoxes
+					if index != activeIndex
+						inActiveExploreBucketBox.visible = false
+						inActiveExploreBucketBox.thumb.thumb.states.switchInstant "default"
+						inActiveExploreBucketBox.thumb.thumb.state = "default"
+						inActiveExploreBucketBox.thumb.label.states.switchInstant "default"
+						inActiveExploreBucketBox.thumb.label.state = "default"
+				for tagLayer in exploreTagsContainer.content.children
+					tagLayer.destroy()
+				exploreTagsContainer.visible = false		
+				for tagObject, index in newActiveExploreBucket.tags
+					tagLayer = comp_tag.copy()
+					tagLayer.parent = exploreTagsContainer.content
+					tagLayer.originX = 0
+					tagLayer.scale = 1.4
+					tagLayer.x = exploreTagsContainer.frame.x
+					tagLayer.y = index*(tagLayer.height + padding)
+					tag_name.text = tagObject.name
+					roundOff = Math.round(tagObject.noOfShares/10000)
+					if roundOff > 100 
+						roundOff = Math.round(roundOff/100)
+					tag_trend.text = roundOff
+				exploreTagsContainer.visible = true
+				
+		
+class ExploreBucket extends Layer
+	constructor: (@options={}) ->
+		@options.width ?= boxSize
+		@options.height ?= boxSize
+		@options.borderRadius ?= "16px"
+		
+		@label = new TextLayer
+			fontSize: 16
+			color: "rgba(255,255,255,1)"
+		@thumbnail = new Layer
+			width: @options.width*0.6
+			height: @options.height*0.6
+# 			borderRadius:  @options.height*0.3
+		
+		super @options
+				
+		@thumbnail.parent = @
+		@thumbnail.centerX()
+		@thumbnail.y = 16
+		@thumbnail.state = "default"
+		@thumbnail.style = backgroundSize: "contain"
+		@label.parent = @
+		@label.textAlign = "center"
+		@label.state = "default"
+		@label.width = @options.width
+		@label.centerX()
+		@label.height = 16
+		@label.y = @thumbnail.y + @thumbnail.height + 16
+		
+		@states =
+			default:
+				height: @options.height
+				width: @options.width
+				x: @options.x
+				y: @options.y
+				borderRadius: "16px"
+			active:	
+				height: ExploreBucketThumbnailsContainerHeight + 2*padding
+				width: Screen.width
+				x: 0
+				y: 0
+				borderRadius: "0px"
+				animationOptions: 
+					curve: Bezier.easeOut
+					time: 0.1	
+# 		@label.states =
+# 			default:
+# 				x: @thumbnail.x
+# 				y: @thumbnail.y + @thumbnail.height + 16
+# 				textAlign: "center"
+# 				width: @options.width
+# 				autoHeight: yes
+# 				animationOptions: 
+# 					curve: Bezier.linear
+# 					time: 0.1	
+# 			active:
+# 				x: @thumbnail.x + @thumbnail.width + padding
+# 				y: @thumbnail.y + @thumbnail.height*0.8
+# 				textAlign: "center"
+# 				width: @options.width
+# 				autoHeight: yes
+# 				animationOptions: 
+# 					curve: Bezier.linear
+# 					time: 0.1		
+				
+		@thumbnail.states =
+			default:
+				x: @options.width*0.2
+				y: 16
+				width: @options.width*0.6
+				height: @options.height*0.6
+# 				borderRadius:  @options.height*0.3
+				animationOptions: 
+					curve: Bezier.easeIn
+					time: 0.1	
+			active:
+# 				x: @options.width*0.2
+# 				y: 16 + ExploreBucketThumbnailsContainerHeight + 0.4*padding
+# 				textAlign: "center"
+				width: 0
+				height: 0
+# 				autoHeight: yes
+				animationOptions: 
+					curve: Bezier.easeOut
+					time: 0.1		
+		
+		@.onClick ->
+			if @.state != "active"
+				search.visible = false
+				back.visible = true
+				scroll.scrollToTop()
+				scroll.scrollHorizontal = false
+				scroll.scrollVertical = false
+				@.states.switchInstant "active"
+				@.state = "active"
+				ExploreBucketThumbnailsContainer.states.active =
+					parent: @
+					visible: true
+					backgroundColor: @.backgroundColor
+					x: padding
+				ExploreBucketThumbnailsContainer.states.switchInstant "active"
+				ExploreBucketThumbnailsContainer.state = "active"
+				ExploreBucketThumbnailsContainer.scrollToLayer(@.thumb)
+				back.visible = true
+				back.parent = @
+				@.thumb.thumb.states.switchInstant "active"
+				@.thumb.thumb.state = "active"
+				@.thumb.label.states.switchInstant "active"
+				@.thumb.label.state = "active"
+				activeExploreBucket = @
+				activeIndex = ExploreBucketBoxes.indexOf(@)
+				for inActiveExploreBucketBox, index in ExploreBucketBoxes
+# 					inActiveExploreBucketBox.label.states.switchInstant "active"
+# 					inActiveExploreBucketBox.label.state = "active"
+					inActiveExploreBucketBox.thumbnail.states.switchInstant "active"
+					inActiveExploreBucketBox.thumbnail.state = "active"
+					
+					if index != activeIndex
+						inActiveExploreBucketBox.visible = false
+						inActiveExploreBucketBox.thumb.thumb.states.switchInstant "default"
+						inActiveExploreBucketBox.thumb.thumb.state = "default"
+						inActiveExploreBucketBox.thumb.label.states.switchInstant "default"
+						inActiveExploreBucketBox.thumb.label.state = "default"
+					else
+						inActiveExploreBucketBox.thumb.thumb.states.switchInstant "active"
+						inActiveExploreBucketBox.thumb.thumb.state = "active"
+						inActiveExploreBucketBox.thumb.label.states.switchInstant "active"
+						inActiveExploreBucketBox.thumb.label.state = "active"
+						
+						
+				for tagLayer in exploreTagsContainer.content.children
+					tagLayer.destroy()
+				exploreTagsContainer.visible = false		
+				for tagObject, index in @.tags
+					tagLayer = comp_tag.copy()
+					tagLayer.parent = exploreTagsContainer.content
+					tagLayer.originX = 0
+					tagLayer.scale = 1.4
+					tagLayer.x = exploreTagsContainer.frame.x
+					tagLayer.y = index*(tagLayer.height + padding)
+					tag_name.text = tagObject.name
+					roundOff = Math.round(tagObject.noOfShares/10000)
+					if roundOff > 100 
+						roundOff = Math.round(roundOff/100)
+					tag_trend.text = roundOff
+				exploreTagsContainer.visible = true
+
+
+
+ExploreBucketBoxes = []
+
+gutter = 20
+padding = 16
+count = horizontalTagsData.buckets.length
+boxSize = (Screen.width-3*padding)/2
+thumbSize = ((Screen.width-3.5*padding-back.width)/3)*1.3
+focusedBoxHeight = 124	
+ExploreBucketThumbnailsContainerHeight = thumbSize + 2*padding
+activeExploreBucket = null
+
+ExploreBucketsCont = new Layer
+	width: Screen.width
+	height: (count/2)*(boxSize+padding) + padding
+	backgroundColor: "#ffffff"
+	parent : explore
+	
+scroll = ScrollComponent.wrap(ExploreBucketsCont)
+scroll.parent = explore
+scroll.scrollHorizontal = false
+scroll.content.clip = false
+scroll.directionLock = true
+scroll.backgroundColor = "rgba(255,255,255,0)"
+scroll.mouseWheelEnabled = true
+scroll.contentInset =
+		bottom: 6*padding + 164
+
+search.parent = scroll.content
+search.x = Align.center
+
+exploreTagsContainer = new ScrollComponent
+	width: Screen.width
+	height: Screen.height - 2*padding
+	x: Align.center
+	y: 3*padding + ExploreBucketThumbnailsContainerHeight
+	backgroundColor: "#fffff"
+exploreTagsContainer.parent = ExploreBucketsCont
+exploreTagsContainer.scrollHorizontal = false
+exploreTagsContainer.backgroundColor = "#fffff"
+exploreTagsContainer.mouseWheelEnabled = true
+exploreTagsContainer.visible = false
+exploreTagsContainer.content.clip = false
+exploreTagsContainer.directionLock = true
+exploreTagsContainer.centerX()
+exploreTagsContainer.contentInset = 
+		right: 2*padding
+		left: 2*padding
+		top: 0.4*padding
+		bottom: padding
+
+exploreTagsContainer.onClick ->
+	flow.showNext(tag_feed)
+
+dropdown.onClick ->
+	flow.showOverlayTop(tag_feed_dropdown)
+
+dismiss.onClick ->
+	flow.showPrevious()
+	
+dismiss_bucket.onClick ->
+	flow.showPrevious()
+
+dismiss_tagFeed.onClick ->
+	flow.showPrevious()
+	
+ExploreBucketThumbnailsContainer = new ScrollComponent
+	width: Screen.width
+	height: ExploreBucketThumbnailsContainerHeight + padding
+	x: back.x + back.width + padding
+ExploreBucketThumbnailsContainer.parent = ExploreBucketsCont
+ExploreBucketThumbnailsContainer.scrollHorizontal = true
+ExploreBucketThumbnailsContainer.scrollVertical = false
+ExploreBucketThumbnailsContainer.visible = false
+ExploreBucketThumbnailsContainer.mouseWheelEnabled = true
+ExploreBucketThumbnailsContainer.content.clip = false
+ExploreBucketThumbnailsContainer.directionLock = true
+ExploreBucketThumbnailsContainer.state = "default"
+ExploreBucketThumbnailsContainer.contentInset = 
+		right: padding
+		left: 0
+		top: 3.6*padding
+		bottom: 0.4*padding		
+
+ExploreBucketThumbnailsContainer.states =
+	default:
+		x: padding
+		parent: ExploreBucketsCont
+		scrollVertical: false
+		visible: false
+		
+back.visible = false
+back.parent = ExploreBucketsCont
+back.scale = 1.2
+back.y = 0.6*padding
+back.x = 1.6*padding
+	
+back.onTap ->
+	back.visible = false
+	search.visible = true
+	ExploreBucketThumbnailsContainer.states.switchInstant "default"
+	ExploreBucketThumbnailsContainer.state = "default"
+	for ExploreBucketBox in ExploreBucketBoxes
+		ExploreBucketBox.visible = true
+		ExploreBucketBox.states.switch "default"
+		ExploreBucketBox.state = "default"
+# 		ExploreBucketBox.label.states.switchInstant "default"
+# 		ExploreBucketBox.label.state = "default"
+		ExploreBucketBox.thumbnail.states.switchInstant "default"
+		ExploreBucketBox.thumbnail.state = "default"
+		ExploreBucketBox.thumb.thumb.states.switchInstant "default"
+		ExploreBucketBox.thumb.thumb.state = "default"
+		ExploreBucketBox.thumb.label.states.switchInstant "default"
+		ExploreBucketBox.thumb.label.state = "default"
+	scroll.scrollHorizontal = false
+	scroll.scrollVertical = true
+	ExploreBucketsCont.width = Screen.width
+	for tagLayer in exploreTagsContainer.content.subLayers
+		tagLayer.destroy()
+	exploreTagsContainer.visible = false
+
+	
+for ExploreBucketObject, index in horizontalTagsData.buckets
+	ExploreBucketBox = new ExploreBucket
+	ExploreBucketBox.parent = ExploreBucketsCont
+	ExploreBucketBox.width = boxSize
+	ExploreBucketBox.height = boxSize	
+	xPosition = if (index%2 != 0 and index !=0) then ExploreBucketBox.width + 2*padding 				else padding
+	ExploreBucketBox.x = xPosition
+	yPosition = search.y + padding + 2*padding + (Math.floor(index/2)) *(ExploreBucketBox.width+padding)
+	
+	ExploreBucketBox.y = yPosition 
+	ExploreBucketBox.states.default =
+				height: boxSize
+				width: boxSize
+				x: xPosition
+				y: yPosition
+				animationOptions: 
+					curve: Bezier.ease
+					time: 0.1
+	ExploreBucketBox.state = "default"			
+	ExploreBucketBox.backgroundColor = ExploreBucketObject.backgroundColor	
+	ExploreBucketBox.label.text = ExploreBucketObject.name
+	ExploreBucketBox.thumbnail.image = ExploreBucketObject.image
+	
+	ExploreBucketBox.tags = ExploreBucketObject.tags
+	ExploreBucketBoxThumb = new ExploreBucketThumb
+		x:index*(.8*padding+thumbSize*0.8)
+	ExploreBucketBoxThumb.parent = ExploreBucketThumbnailsContainer.content
+	ExploreBucketBoxThumb.thumb.image = ExploreBucketBox.thumbnail.image
+	ExploreBucketBoxThumb.label.text = ExploreBucketObject.name
+	ExploreBucketBox.thumb = ExploreBucketBoxThumb
+	ExploreBucketBox.thumb.state = "default"
+	ExploreBucketBoxes.push(ExploreBucketBox)	
+					
 
 
 #Gallery
@@ -551,6 +954,27 @@ for info,i in NavbtnsInfo
 	btn.parent = bottomNav
 	btn.name = info.name
 	btn.Thumbnail.image = iconsData.navIcons[i].link
+	if info.dataType == "A"
+		btn.onClick ->
+			guiding.visible = false
+			HomeHeader.ScreenName.text = "Explore"
+			explore.visible = true
+			HomeBody.addChild explore
+	else if info.dataType == "V"
+		btn.onClick ->
+			guiding.visible = true
+			HomeHeader.ScreenName.text = "Home"
+			explore.parent = null
+			flow.showPrevious()
+			explore.visible = false
+			bgComposeTypeParent.stateCycle("one","two")
+			overlay.stateCycle("one","two")
+			animationB.start()
+			animationB.on Events.AnimationEnd, animationA.start
+	else
+		btn.onClick ->
+			HomeHeader.visible = true
+			
 
 #composeTypeArray
 composeTypeArray = [
@@ -639,10 +1063,10 @@ feed = new Layer
 
 ComposeTypeButtons[0].onClick ->
 	flow.showNext(Draft)
-
-navButtons[2].onClick ->
-	bgComposeTypeParent.stateCycle("one","two")
-	overlay.stateCycle("one","two")
+# 
+# navButtons[2].onClick ->
+# 	bgComposeTypeParent.stateCycle("one","two")
+# 	overlay.stateCycle("one","two")
 
 #print overlay.states.current.name 
 
@@ -1791,9 +2215,9 @@ animationB = new Animation guidingArrow,
 		#delay: 3
 		time: 0.08
 
-navButtons[2].onClick ->
-	animationB.start()
-	animationB.on Events.AnimationEnd, animationA.start
+# navButtons[2].onClick ->
+# 	animationB.start()
+# 	animationB.on Events.AnimationEnd, animationA.start
 
 
 
