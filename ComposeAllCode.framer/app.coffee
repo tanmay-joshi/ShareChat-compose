@@ -1,5 +1,6 @@
 InputModule = require "input-framer/input"
 CameraInput = require "framer-camera-input/CameraInput"
+FontAwesome = require 'FontAwesome'
 
 #General
 #variables
@@ -207,7 +208,8 @@ class Filters extends Layer
 		@Thumbnail.height = @options.height/2
 		@Thumbnail.x = Align.center
 		@Thumbnail.y =Align.top(6)
-		@Thumbnail.backgroundColor = "#000000"
+		@Thumbnail.scale = 0.7
+		#@Thumbnail.backgroundColor = "#000000"
 		
 		@FilterName.fontSize = 12
 		@FilterName.width = @options.width * 0.8
@@ -229,12 +231,13 @@ class card extends Layer
 		@options.type = "audio"
 		
 		@identity = new TextLayer
+		@icon = new Layer
 		super @options
 		
 		@identity.parent = @
 		@identity.fontSize = 9
-		@identity.color = "#ffffff"
-		@identity.backgroundColor = "#aaaaaa"
+		@identity.color = "#eeeeee"
+		@identity.backgroundColor = "#eeeeee"
 		@identity.width = 12
 		@identity.height = 12
 		@identity.x = Align.right(-2)
@@ -243,6 +246,13 @@ class card extends Layer
 		@identity.text ?= "A"
 		@identity.fontWeight = "bold"
 		@identity.borderRadius = 3
+		
+		@icon.parent = @identity
+		@icon.width = 8
+		@icon.height = 8
+		@icon.x = Align.center()
+		@icon.y = Align.center()
+		#@icon.backgroundColor = "#333"
 
 #Day Component
 class Day extends Layer
@@ -649,19 +659,19 @@ scroll.contentInset =
 #bottomBarInfo Array
 BottomBarInfo = [
 	{
-		"icon": "#333333", "name": "All", "dataType": "ALL"
+		"icon": "images/Icons/typeIcons/image.png", "name": "All", "dataType": "ALL"
 	},
 	{
-		"icon": "#343333", "name": "Image", "dataType": "I"
+		"icon": "images/Icons/typeIcons/image.png", "name": "Image", "dataType": "I"
 	},
 	{
-		"icon": "#353333", "name": "Video", "dataType": "V"
+		"icon": "images/Icons/typeIcons/video.png", "name": "Video", "dataType": "V"
 	},
 	{
-		"icon": "#363633", "name": "Audio", "dataType": "A"
+		"icon": "images/Icons/typeIcons/audio.png", "name": "Audio", "dataType": "A"
 	},
 	{
-		"icon": "#373333", "name": "GIF", "dataType": "G"
+		"icon": "images/Icons/typeIcons/gif.png", "name": "GIF", "dataType": "G"
 	},
 ]
 
@@ -686,7 +696,7 @@ scrollGallery = new ScrollComponent
 
 for info, i in BottomBarInfo
 	Tab = new Filters
-	Tab.Thumbnail.backgroundColor = info.icon
+	Tab.Thumbnail.image = info.icon
 	Tab.FilterName.text = info.name
 	Tab.x = 0 + (i * Screen.width/5)
 	Tab.name = info.name
@@ -745,6 +755,7 @@ for a in [0...Object.keys(galleryData).length]
 				parent: newDay.DayContent
 				image: galleryData[daysData[a].name][index].thumb
 			caard.identity.text = galleryData[daysData[a].name][index].dataType
+			caard.icon.image = galleryData[daysData[a].name][index].icon
 			cards.push(caard)
 		
 		reSize(newDay)
@@ -793,6 +804,7 @@ for i in [0...5]
 						y: rowIndex * cardWidth
 						parent: newDay.DayContent
 						image: galleryData[daysData[a].name][indx].thumb
+					caard.icon.image = galleryData[daysData[a].name][indx].icon
 					caard.identity.text = galleryData[daysData[a].name][indx].dataType
 					cards.push(caard)
 			else
@@ -809,6 +821,7 @@ for i in [0...5]
 							y: (rowIndex) * cardWidth
 							parent: newDay.DayContent
 							image: galleryData[daysData[a].name][z].thumb
+						caard.icon.image = galleryData[daysData[a].name][z].icon
 						caard.identity.text = galleryData[daysData[a].name][z].dataType
 						cards.push(caard)
 			reSize(newDay)
