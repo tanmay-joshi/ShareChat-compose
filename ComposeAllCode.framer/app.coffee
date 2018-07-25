@@ -1494,7 +1494,6 @@ rows = horizontalTagsData.buckets.length
 gutter = 20
 horizontalBucketSize = 56
 tagWidthRatio = 0.20
-padding = 20
 scalefactor = 1
 borderRadius = 8
 
