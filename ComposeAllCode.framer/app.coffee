@@ -967,6 +967,7 @@ for info,i in NavbtnsInfo
 			HomeHeader.ScreenName.text = "Explore"
 			explore.visible = true
 			HomeBody.addChild explore
+			bgComposeTypeParent.states.switchInstant "two"
 	else if info.dataType == "V"
 		btn.onClick ->
 			guiding.visible = true
@@ -974,7 +975,10 @@ for info,i in NavbtnsInfo
 			explore.parent = null
 			flow.showPrevious()
 			explore.visible = false
-			bgComposeTypeParent.stateCycle("one","two")
+			if bgComposeTypeParent.state == "two"
+				bgComposeTypeParent.stateCycle("two", "one")	
+			else
+				bgComposeTypeParent.stateCycle("one", "two")
 			overlay.stateCycle("one","two")
 			animationB.start()
 			animationB.on Events.AnimationEnd, animationA.start
@@ -2124,10 +2128,8 @@ Commeting = new Layer
 
 Commeting.states =
 	"one":
-		text: "Commenting"
 		backgroundColor: "#FF5A7E"
 	"two":
-		text: "Commenting"
 		backgroundColor: "#ffffff"
 
 Commeting.states.switchInstant "one"
@@ -2141,8 +2143,10 @@ CommetingText = new TextLayer
 	textAlign: "center"
 CommetingText.states =
 	"one":
+		text: "Commenting"
 		color: "#fff"
 	"two":
+		text: "Commenting"
 		color: "#666"
 CommetingText.states.switchInstant "one"
 
