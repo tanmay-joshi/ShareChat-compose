@@ -1371,8 +1371,8 @@ PasteFunction = new Layer
 	shadowColor: "rgba(0,0,0,0.14)"
 PasteIcon = new Layer
 	parent: PasteFunction
-	width: PasteFunction.height - 0.2*padding
-	height: PasteFunction.height - 0.2*padding
+	width: PasteFunction.height - 0.8*padding
+	height: PasteFunction.height - 0.8*padding
 	image: "images/Icons/ActionIcons/05.png"
 	y: Align.center()
 	x: Align.left(padding)
