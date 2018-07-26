@@ -1371,8 +1371,8 @@ PasteFunction = new Layer
 	shadowColor: "rgba(0,0,0,0.14)"
 PasteIcon = new Layer
 	parent: PasteFunction
-	width: PasteFunction.height - 1.5*padding
-	height: PasteFunction.height - 1.5*padding
+	width: PasteFunction.height - 0.2*padding
+	height: PasteFunction.height - 0.2*padding
 	image: "images/Icons/ActionIcons/05.png"
 	y: Align.center()
 	x: Align.left(padding)
@@ -1454,7 +1454,7 @@ TextHeader.Back.onClick ->
 	flow.showPrevious()
 
 Input.onFocus ->
-	TextFunctions.y = Align.bottom(-240)
+	TextFunctions.y = Align.bottom(-300)
 
 Input.onBlur ->
 	TextFunctions.y = Align.bottom(-padding)
@@ -2083,10 +2083,8 @@ SharingText = new TextLayer
 	textAlign: "center"
 SharingText.states =
 	"one":
-		text: "Sharing"
 		color: "#fff"
 	"two":
-		text: "Not Sharing"
 		color: "#666"
 SharingText.states.switchInstant "one"
 
@@ -2124,10 +2122,8 @@ CommetingText = new TextLayer
 	textAlign: "center"
 CommetingText.states =
 	"one":
-		text: "Commenting"
 		color: "#fff"
 	"two":
-		text: "Not"
 		color: "#666"
 CommetingText.states.switchInstant "one"
 
