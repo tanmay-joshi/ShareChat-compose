@@ -130,7 +130,6 @@ class profileHead extends Layer
 		
 		@ProfileTag.parent = @
 		@ProfileTag.padding = padding
-		@ProfileTag.backgroundColor = "#ddd"
 		@ProfileTag.fontSize = 14
 		@ProfileTag.color = "#333"
 		@ProfileTag.borderRadius = 6
@@ -139,6 +138,14 @@ class profileHead extends Layer
 		@ProfileTag.width ?= 200
 		@ProfileTag.x = 2* padding
 		@ProfileTag.y = Align.top(@ProfileBio.height + @ProfileBio.y + 2* padding)
+	
+		@ProfileTag.states = 
+			select:
+				text: "Select Tag"
+				backgroundColor: "#ddd"
+			selecting:
+				text: "Selecting"
+				backgroundColor: "#000000"
 		
 		@ppTag.parent = @
 		@ppTag.padding = padding
@@ -1284,12 +1291,13 @@ profile = new profileHead
 	y: TextHeader.height
 	name: "profile"	
 	
-profile.ProfileTag.text = "Select Tag"
+profile.ProfileTag.states.switchInstant "select"
 profile.ProfileName.text = "Sohil"
 profile.ProfileBio.text = "Bhokal toh m hee hu.. baaki ka pata nhi"
 	
 profile.ProfileTag.onClick ->
-	profile.ProfileTag.text = "Selecting"
+	profile.ProfileTag.states.switchInstant "selecting"
+	Input.unfocus() 
 	flow.showOverlayBottom(horizontalTagSelect)
 
 InputText = new Layer
@@ -1633,10 +1641,18 @@ class Tag extends Layer
 		
 		@onClick ->
 			flow.showPrevious()
-			profile.ProfileTag.text = @label.text
-			profile.ProfileTag.backgroundColor = "#eed"
-			profile.ppTag.opacity = 0
-			profile.ProfileTag.borderWidth = 0
+			flow.showNext(Upload)
+			selectedTag = this.text
+			uploadProfile.ProfileTag.text = selectedTag
+			if flow.current.name == "Upload"
+					uploading.animate "two",
+						delay: 0.5
+						time: Utils.randomNumber(2,4)
+# 			profile.ProfileTag.text = @label.text
+# 			profile.ProfileTag.backgroundColor = "#eed"
+# 			profile.ppTag.opacity = 0
+# 			profile.ProfileTag.borderWidth = 0
+			
 		
 		@label.parent = @
 		@label.centerY()
@@ -1971,7 +1987,6 @@ TagSelectHeader.Back.onClick ->
 	flow.showPrevious()
 
 
-
 header = new Layer
 	parent: TagSelectBody
 	width: Screen.width
@@ -2083,8 +2098,10 @@ SharingText = new TextLayer
 	textAlign: "center"
 SharingText.states =
 	"one":
+		text: "Sharing"
 		color: "#fff"
 	"two":
+		text: "Sharing"
 		color: "#666"
 SharingText.states.switchInstant "one"
 
@@ -2107,8 +2124,10 @@ Commeting = new Layer
 
 Commeting.states =
 	"one":
+		text: "Commenting"
 		backgroundColor: "#FF5A7E"
 	"two":
+		text: "Commenting"
 		backgroundColor: "#ffffff"
 
 Commeting.states.switchInstant "one"
